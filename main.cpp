@@ -62,14 +62,6 @@ int main()
 }
 
 //call Example::main() in main()
-
-
-
-
-
-
-
-
 struct CentralProcessingUnit
 {
     int numberOfCores;
@@ -77,6 +69,9 @@ struct CentralProcessingUnit
     int l1CacheSize {8};
     int l2CacheSize {16};
     int l3CacheSize {32};
+
+    int counter;
+    int resetTimer;
 
     CentralProcessingUnit(): numberOfCores{8},clockSpeedInGHz {2.8f} {}
 
@@ -98,6 +93,41 @@ float CentralProcessingUnit::processData()
     float processedData = 1.0f;
     return processedData;
 }
+
+struct CPUCounter //For #1
+{
+    CentralProcessingUnit cpu1;
+    int startCounter(int initVal, int maxVal)
+    {
+        for (int i = initVal ; i < maxVal+1 ; i++)
+        {
+            cpu1.counter = i; 
+            std::cout<<cpu1.counter<<"\n";
+            if (cpu1.counter == maxVal)
+                return cpu1.counter;
+        }
+        return 0;
+    }   
+};
+
+struct CPUReset //While #1
+{
+    CentralProcessingUnit cpu1;
+    std::string reset()
+    {
+        int i = 0;
+        cpu1.resetTimer = 0;
+        while (i < 10)
+        {
+            cpu1.resetTimer += 1;
+            std::cout << "It has been " << cpu1.resetTimer << " second(s) since reset was initiated" << std::endl;
+            if (cpu1.resetTimer == 10)
+                return "The CPU has been reset";
+        }
+        return "Error while resetting";
+    }
+};
+
 
 struct Cat
 {
@@ -435,6 +465,8 @@ struct Library
     void checkOutBook();
     std::string returnBook();
     float chargeLateFee(float lateFee, int numDays);
+
+    std::string buyNewBooks(int numNewBooks); 
 };
 
 Library::Library()
@@ -444,6 +476,19 @@ Library::Library()
     numShelves = 50;
     numBooks = 3000;
     lateFees = 2.5f;
+}
+
+std::string Library::buyNewBooks (int numNewBooks) //While #2
+{
+    int i = 0;
+    while (i < numNewBooks + 1)
+    { 
+        if (i == numNewBooks)
+            return "We have bought " + std::to_string(numNewBooks) + " new books for our library\n" + "We now have " + std::to_string(numBooks) + " books in our library\n";
+        numBooks++;
+        i++;
+    }
+    return "We didn't buy enough books";
 }
 
 void Library::checkOutBook()
@@ -471,7 +516,7 @@ struct University
 
     void conductExams();
     float collectFees(int numStudents,float yearlyFees);
-    std::string holdGraduation();
+    std::string holdGraduation(int numStudents);
 };
 
 void University::conductExams()
@@ -484,8 +529,15 @@ float University::collectFees(int numStudents1, float yearlyFees1)
     return numStudents1 * yearlyFees1;
 }
 
-std::string University::holdGraduation()
+std::string University::holdGraduation(int numStudents) //For #2
 {
+    for (int num = 0; num < numStudents + 1; num++)
+    {
+        std::cout << "Calling on student " << num << " to recieve their degree\n";
+        if (num == numStudents)
+            return "You are the last student of the batch, good luck to you all\n";
+    }
+    
     return "Good bye, good luck";
 }
 
@@ -509,6 +561,8 @@ int main()
     Example::main();
 
     CentralProcessingUnit cpu1;
+    CPUCounter counter1;
+    CPUReset rst1;
     Cat cat1;
     Cat::Tree tree1;
     Plane plane1;
@@ -522,6 +576,13 @@ int main()
 
     University university1;
 
+    auto cnt = counter1.startCounter(0,15);
+    std::cout << "cnt.counter: " << cnt << std::endl;
+    
+    auto rst = rst1.reset();
+    std::cout << "Reset message: " << rst << std::endl;
+    
+    
     std::cout << "CPU communication \n";
     cpu1.communicateWithRAM();
     cpu1.communicateWithMotherboard();
@@ -572,12 +633,18 @@ int main()
     library1.checkOutBook();
     std::cout << "\n";
 
+    auto msg = library1.buyNewBooks(30);
+    std::cout << msg << std::endl;
+    std::cout << "\n";
+
     std::cout << "University Properties and Actions: \n";
     university1.conductExams();
     std::cout << "This University's Music Department has " + std::to_string(university1.musicDepartment1.numUndergraduateStudents) + " students";
     std::cout << "\n";
     std::cout << "\n";
-
+    
+    auto grad = university1.holdGraduation(20);
+    std::cout << grad << "\n";
 
 
 
